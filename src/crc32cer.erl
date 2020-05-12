@@ -5,10 +5,6 @@
 
 -on_load(init/0).
 
--ifndef(APPLICATION).
--define(APPLICATION, crc32cer).
--endif.
-
 -spec init() -> ok.
 init() ->
   _ = erlang:load_nif(so_path(), 0),
@@ -24,12 +20,12 @@ nif(_Acc, _IoData) ->
 
 -spec so_path() -> string().
 so_path() ->
-  filename:join([get_nif_bin_dir(), "crc32cer"]).
+  filename:join([get_nif_bin_dir(), "crc32cer_nif"]).
 
 get_nif_bin_dir() ->
   {ok, Cwd} = file:get_cwd(),
   get_nif_bin_dir(
-    [ code:priv_dir(?APPLICATION)
+    [ code:priv_dir(crc32cer)
     , filename:join([Cwd, "..", "priv"])
     , filename:join(Cwd, "priv")
     , os:getenv("NIF_BIN_DIR")
@@ -38,7 +34,7 @@ get_nif_bin_dir() ->
 get_nif_bin_dir([]) -> erlang:error(crc32cer_nif_not_found);
 get_nif_bin_dir([false | Rest]) -> get_nif_bin_dir(Rest);
 get_nif_bin_dir([Dir | Rest]) ->
-  case filelib:wildcard(filename:join([Dir, "crc32cer.*"])) of
+  case filelib:wildcard(filename:join([Dir, "crc32cer_nif*"])) of
     [] -> get_nif_bin_dir(Rest);
     [_ | _] -> Dir
   end.

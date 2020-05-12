@@ -1,25 +1,15 @@
-PROJECT = crc32cer
-PROJECT_DESCRIPTION = CRC32C as nif for Erlang
-PROJECT_VERSION = 0.1.2
+.PHONY: all clean compile tests hex-publish
 
-SP = 2
+all: compile
 
-CPPFLAGS = -Wno-sign-compare -Wno-unused-function
-LDFLAGS += -shared -lstdc++
+compile:
+	@rebar3 compile
 
-ERLC_OPTS = -Werror +warn_unused_vars +warn_shadow_vars +warn_unused_import +warn_obsolete_guard +debug_info
+tests:
+	@rebar3 eunit -v
 
-EUNIT_OPTS = verbose
+clean:
+	@rebar3 clean
 
-ifeq ($(shell uname -s),Darwin)
-	CFLAGS += -O3 -std=c99 -arch x86_64 -finline-functions -Wall -Wmissing-prototypes
-	CXXFLAGS += -O3 -arch x86_64 -finline-functions -Wall
-	LDFLAGS += -arch x86_64 -flat_namespace -undefined suppress
-else ifeq ($(shell uname -s),Linux)
-	CFLAGS += -O3 -std=gnu99 -finline-functions -Wall -Wmissing-prototypes
-endif
-
-include erlang.mk
-
-hex-publish: distclean
-	rebar3 hex publish
+hex-publish: clean
+	@rebar3 hex publish
